@@ -1,0 +1,7 @@
+---
+module_name: iterators
+version: 0.1.0
+hash: e05334863a16c31b81b2d6d64c167eb4
+module_paths:
+  - ${MODULES_PATH}
+modules: {}

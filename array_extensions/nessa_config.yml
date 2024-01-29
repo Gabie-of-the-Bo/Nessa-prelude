@@ -1,0 +1,7 @@
+---
+module_name: array_extensions
+version: 0.1.0
+hash: bc1d8c3e96117707247fbd6932524a1f
+module_paths:
+  - ${MODULES_PATH}
+modules: {}

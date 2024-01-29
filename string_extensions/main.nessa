@@ -1,0 +1,26 @@
+class CodePointIterator {
+    str: &String;
+    pos: Int;
+}
+
+fn iterator(it: CodePointIterator) -> CodePointIterator {
+    return move(it);
+}
+
+fn next(it: @CodePointIterator) -> Int {
+    let res = it.str().code_point_at(*it.pos());
+
+    it.pos() := it.pos() + res.deref().code_point_length();
+
+    return move(res);
+}
+
+fn is_consumed(it: @CodePointIterator) -> Bool {
+    return it.pos() >= it.str().len();
+}
+
+implement Iterable<CodePointIterator, Int> for CodePointIterator;
+
+fn code_points(str: &String) -> CodePointIterator {
+    return CodePointIterator(str, 0);
+}

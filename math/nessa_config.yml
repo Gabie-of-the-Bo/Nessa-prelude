@@ -1,0 +1,10 @@
+---
+module_name: math
+version: 0.1.0
+hash: 81c4f5e29445fafd9753fe1748b4650a
+module_paths:
+  - "${MODULES_PATH}"
+modules:
+  range:
+    path: "${MODULES_PATH}/range"
+    version: 0.1.0
