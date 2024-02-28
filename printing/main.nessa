@@ -1,0 +1,4 @@
+fn<T> println(obj: 'T [Printable]) {
+    print(fwd<'T>(obj));
+    print("\n");
+}
