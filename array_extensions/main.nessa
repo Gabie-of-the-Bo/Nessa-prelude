@@ -45,6 +45,91 @@ fn<T> fill_with(array: @Array<'T>, f: Int => 'T) -> @Array<'T> {
     return array;
 }
 
+fn<T> remove_range(array: @Array<'T>, from_idx: Int, to_idx: Int) {
+    let length = array.len();
+    let res = arr_with_capacity<'T>(length - (to_idx - from_idx));
+
+    let i = 0;
+
+    while i < from_idx {
+        res.push(fwd<'T>(array[*i]));
+        i.inc();
+    }
+
+    i = *to_idx;
+
+    while i < length {
+        res.push(fwd<'T>(array[*i]));
+        i.inc();
+    }
+
+    array := move(res);
+}
+
+fn<T> push_all(array: @Array<'T>, other: Array<'T>) {
+    array.reserve(array.len() + other.len());
+
+    for i in other {
+        array.push(fwd<'T>(i));
+    }
+}
+
+fn<T> split(array: @Array<'T>, idx: Int) -> Array<'T> {
+    let length = array.len();
+    let head = arr_with_capacity<'T>(*idx);
+    let tail = arr_with_capacity<'T>(length - idx);
+
+    // Head
+    let i = 0;
+
+    while i < idx {
+        head.push(fwd<'T>(array[*i]));
+        i.inc();
+    }
+
+    // Tail
+    i = *idx;
+
+    while i < length {
+        tail.push(fwd<'T>(array[*i]));
+        i.inc();
+    }
+
+    array := move(head);
+
+    return move(tail);
+}
+
+fn<T> insert_all(array: @Array<'T>, other: Array<'T>, idx: Int) {
+    let tail = array.split(*idx);
+    array.push_all(move(other));
+    array.push_all(move(tail));
+}
+
+fn<T> contains(array: &Array<'T>, f: &'T) -> Bool {
+    for i in array {
+        if i == f {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+fn<T> index_of(array: &Array<'T>, f: &'T) -> Int {
+    let idx = 0;
+
+    for i in array {
+        if i == f {
+            return move(idx);
+        }
+
+        idx.inc();
+    }
+
+    return -1;
+}
+
 fn<T, G> transform(array: @Array<'T>, f: 'T => 'G) -> Array<'G> {
     let res = arr_with_capacity<'G>(array.len());
 
@@ -59,6 +144,20 @@ fn<T> transform_inplace(array: @Array<'T>, f: 'T => 'T) -> @Array<'T> {
     for i in array {
         i := f(*i);
     }
+
+    return array;
+}
+
+fn<T> retain(array: @Array<'T>, f: 'T => Bool) -> @Array<'T> {
+    let res = arr_with_capacity<'T>(array.len());
+
+    for i in array {
+        if f(*i) {
+            res.push(fwd<'T>(i));
+        }
+    }
+
+    array := move(res);
 
     return array;
 }
