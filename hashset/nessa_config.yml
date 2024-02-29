@@ -1,13 +1,16 @@
 ---
 module_name: hashset
 version: 0.1.0
-hash: e3bd019f074aa18063f3c488a09af4b0
+hash: 3f9453253a33bdc839efef41877b4309
 module_paths:
-  - ${MODULES_PATH}
+  - "${MODULES_PATH}"
 modules:
-  range:
-    path: ${MODULES_PATH}/range
-    version: 0.1.0
   hash:
-    path: ${MODULES_PATH}/hash
+    path: "${MODULES_PATH}/hash"
+    version: 0.1.0
+  array_extensions:
+    path: "${MODULES_PATH}/array_extensions"
+    version: 0.1.0
+  range:
+    path: "${MODULES_PATH}/range"
     version: 0.1.0
