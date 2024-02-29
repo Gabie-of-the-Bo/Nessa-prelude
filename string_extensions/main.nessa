@@ -1,3 +1,7 @@
+import * from array_extensions;
+
+// Code point iterator
+
 class CodePointIterator {
     str: &String;
     pos: Int;
@@ -23,4 +27,62 @@ implement Iterable<CodePointIterator, Int> for CodePointIterator;
 
 fn code_points(str: &String) -> CodePointIterator {
     return CodePointIterator(str, 0);
+}
+
+// Algorithms
+
+fn starts_with(iter: CodePointIterator, start: &String) -> Bool {
+    let start_cp = start.code_points();
+
+    for i in move(iter) {
+        if start_cp.is_consumed() {
+            return true;
+        }
+
+        let j = start_cp.next();
+
+        if i != j {
+            return false;
+        }
+    }
+    
+    return start_cp.is_consumed();
+}
+
+fn starts_with(str: &String, start: &String) -> Bool {
+    return starts_with(str.code_points(), start);
+}
+
+fn contains(str: &String, haystack: &String) -> Bool {
+    let str_cp = str.code_points();
+
+    while !str_cp.is_consumed() {
+        if starts_with(*str_cp, haystack) {
+            return true;
+        }
+
+        str_cp.next();
+    }
+
+    return false;
+}
+
+fn replace(str: &String, haystack: &String, rep: String) -> String {
+    let res = arr_with_capacity<Int>(str.len());
+    let str_cp = str.code_points();
+
+    while !str_cp.is_consumed() {
+        if starts_with(*str_cp, haystack) {
+            for i in haystack.code_points() {
+                str_cp.next();
+            }
+
+            res.push_all(rep.utf8_array());
+
+        } else {
+            res.push(str_cp.next());
+        }
+    }
+
+    return utf8_to_str(res);
 }

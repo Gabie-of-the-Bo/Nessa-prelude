@@ -1,6 +1,9 @@
 ---
 module_name: string_extensions
 version: 0.1.0
-hash: f574ef473361b72a6858279daca8d2ac
+hash: 71a9c312773ee3742378b7c2a8ed2abf
 module_paths: []
-modules: {}
+modules:
+  array_extensions:
+    path: "${MODULES_PATH}/array_extensions"
+    version: 0.1.0
