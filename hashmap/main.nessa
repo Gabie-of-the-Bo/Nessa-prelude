@@ -2,8 +2,50 @@ import interface Hashable from hash;
 import fn hash from hash;
 import fn { iterator, next, is_consumed, range } from range;
 
+// Syntax definition
+
+syntax hashmap_initialization from 
+    '<' {' '} Arg(<type>, ktype) {' '} ',' {' '} Arg(<type>, vtype) {' '} '>' {' '} 
+    '{' {' '} 
+        [{Arg(<expr>, keys) {' '} ':' {' '} Arg(<expr>, values) {' '} ',' {' '}} Arg(<expr>, keys) {' '} ':' {' '} Arg(<expr>, values)] 
+    {' '} '}' 
+{
+    // Create key and value arrays
+    {#let keys = arr<} {$ktype} {#>(}{#);}
+    {#let values = arr<} {$vtype} {#>(}{#);}
+
+    {@i in $keys} {
+        {#keys.push(} {$i} {#);\n}
+    }
+
+    {@i in $values} {
+        {#values.push(} {$i} {#);\n}
+    }
+
+    // Create hashmap and populate
+    {#let res = hashmap<} {$ktype} {#, } {$vtype} {#>(}{#);}
+    
+    {#
+        let idx = 0;
+        let length = values.len();
+
+        while idx < length \{
+    }
+        // Be sure to fwd the values with the correct types
+        {#res.add(fwd<} {$ktype} {#>(keys[*idx]), fwd<} {$vtype} {#>(values[*idx]));}
+        {#idx.inc();}
+    {#
+        \}
+    }
+
+    {#return move(res);}
+}
+
+// Class definition
+
 class HashMap<V, K> {
     buckets: Array<Array<('V [Hashable], 'K)>>;
+    num_elems: Int;
 }
 
 fn<K, V> init(map: @HashMap<'K [Hashable], 'V>, size: Int) {
@@ -16,7 +58,7 @@ fn<K, V> init(map: @HashMap<'K [Hashable], 'V>, size: Int) {
 }
 
 fn<K, V> hashmap() -> HashMap<'K [Hashable], 'V> {
-    let res = HashMap(arr<Array<('K, 'V)>>());
+    let res = HashMap(arr<Array<('K, 'V)>>(), 0);
     res.init(10);
 
     return move(res);
@@ -26,7 +68,7 @@ fn<K, V> rehash(map: @HashMap<'K [Hashable], 'V>) {
     let b = map.buckets();
     let size = b.len();
 
-    let aux = HashMap(arr<Array<('K, 'V)>>());
+    let aux = HashMap(arr<Array<('K, 'V)>>(), 0);
     aux.init(size * 2);
 
     for bucket in map.buckets() {
@@ -42,11 +84,52 @@ fn<K, V> add(map: @HashMap<'K [Hashable], 'V>, key: 'K, value: 'V) {
     let b = map.buckets();
     let size = b.len();
     let pos = hash(*key) % size;
+    let bucket = b[*pos];
 
-    b[*pos].push((move(key), move(value)));
+    let idx = -1;
+    let i = -1;
+    
+    for p in bucket {
+        if p.get_0() == key {
+            idx := *i;
+        }
 
-    if b[*pos].len() > size {
+        i.inc();
+    }
+
+    if idx == -1 {
+        bucket.push((move(key), move(value)));
+        map.num_elems().inc();
+
+    } else {
+        bucket.set((move(key), move(value)), *idx);
+    }
+
+    if bucket.len() > size {
         map.rehash();
+    }
+}
+
+fn<K, V> remove(map: @HashMap<'K [Hashable], 'V>, key: 'K) {
+    let b = map.buckets();
+    let size = b.len();
+    let pos = hash(*key) % size;
+    let bucket = b[*pos];
+
+    let idx = -1;
+    let i = 0;
+    
+    for p in bucket {
+        if p.get_0() == key {
+            idx := *i;
+        }
+
+        i.inc();
+    }
+
+    if idx != -1 {
+        bucket.remove(*idx);
+        map.num_elems().dec();
     }
 }
 
@@ -77,3 +160,104 @@ fn<K, V> contains(map: @HashMap<'K [Hashable], 'V>, key: @'K) -> Bool {
 
     return false;
 }
+
+fn<K, V> len(map: &HashMap<'K [Hashable], 'V>) -> Int {
+    return *map.num_elems();
+}
+
+// Iterator
+
+class HashMapIterator<K, V> {
+    map: &HashMap<'K, 'V>;
+    bucket: Int;
+    idx: Int;
+}
+
+fn<K, V> iterator(it: HashMapIterator<'K, 'V>) -> HashMapIterator<'K, 'V> {
+    return move(it);
+}
+
+fn<K, V> next(it: @HashMapIterator<'K, 'V>) -> ('K, 'V) {
+    let b = it.bucket();
+    let i = it.idx();
+    let s = it.map();
+
+    let curr_bucket = (s.buckets())[*b];
+    let res = curr_bucket[*i];
+
+    i.inc();
+
+    if i == curr_bucket.len() {
+        let num_buckets = s.buckets().len();
+        i := 0;
+        b := b + 1;
+
+        while b < num_buckets {
+            curr_bucket = (s.buckets())[*b];
+
+            if curr_bucket.len() > 0 {
+                return *res;
+            }
+
+            b := b + 1;
+        }
+    }
+
+    return *res;
+}
+
+fn<K, V> is_consumed(it: @HashMapIterator<'K, 'V>) -> Bool {
+    return it.bucket() == it.map().buckets().len();
+}
+
+fn<K, V> iterator(map: &HashMap<'K, 'V>) -> HashMapIterator<'K, 'V> {
+    let idx = 0;
+
+    // Get first nonempty bucket
+    for bucket in map.buckets() {
+        if bucket.len() > 0 {
+            return HashMapIterator(map, *idx, 0);
+        }
+
+        idx.inc();
+    }
+
+    return HashMapIterator(map, 0, 0);
+}
+
+fn<K, V> iterator(map: @HashMap<'K, 'V>) -> HashMapIterator<'K, 'V> {
+    return iterator(map.demut());
+}
+
+implement<K, V> Iterable<HashMapIterator<'K, 'V>, ('K, 'V)> for HashMapIterator<'K, 'V>;
+implement<K, V> Iterable<HashMapIterator<'K, 'V>, ('K, 'V)> for @HashMap<'K, 'V>;
+implement<K, V> Iterable<HashMapIterator<'K, 'V>, ('K, 'V)> for &HashMap<'K, 'V>;
+
+// Printable interface
+
+fn<K, V> print(map: &HashMap<'K [Printable], 'V [Printable]>) {
+    let idx = 0;
+
+    print("{");
+
+    for i in map {
+        print(*i.get_0());
+        print(": ");
+        print(*i.get_1());
+
+        idx.inc();
+
+        if idx < map.len() {
+            print(", ");
+        }
+    }
+
+    print("}");
+}
+
+fn<K, V> print(map: @HashMap<'K [Printable], 'V [Printable]>) {
+    print(map.demut());
+}
+
+implement<K, V> Printable for @HashMap<'K [Printable], 'V [Printable]>;
+implement<K, V> Printable for &HashMap<'K [Printable], 'V [Printable]>;
