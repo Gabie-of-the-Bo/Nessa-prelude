@@ -1,5 +1,6 @@
+// Simple range
+
 class Range {
-    start: Int;
     current: Int;
     end: Int;
 }
@@ -21,10 +22,74 @@ fn is_consumed(it: @Range) -> Bool {
 
 implement Iterable<Range, Int> for Range;
 
+fn range(to: Int) -> Range {
+    return Range(0, *to);
+}
+
 fn range(from: Int, to: Int) -> Range {
-    return Range(*from, *from, *to);
+    return Range(*from, *to);
+}
+
+fn irange(to: Int) -> Range {
+    return Range(0, *to + 1);
 }
 
 fn irange(from: Int, to: Int) -> Range {
-    return Range(*from, *from, *to + 1);
+    return Range(*from, *to + 1);
+}
+
+// Skip range
+
+class SkipRange {
+    current: Int;
+    end: Int;
+    skip: Int;
+}
+
+fn iterator(it: SkipRange) -> SkipRange {
+    return *it;
+}
+
+fn next(it: @SkipRange) -> Int {
+    let curr: @Int = it.current();
+    curr := curr + it.skip();
+
+    return *curr - it.skip();
+}
+
+fn is_consumed(it: @SkipRange) -> Bool {
+    if it.skip() > 0 {
+        return it.current() >= it.end();
+    }
+    
+    return it.current() <= it.end();
+}
+
+implement Iterable<SkipRange, Int> for SkipRange;
+
+fn range(from: Int, to: Int, skip: Int) -> SkipRange {
+    return SkipRange(*from, *to, *skip);
+}
+
+fn rev_range(to: Int) -> SkipRange {
+    return rev_range(0, move(to));
+}
+
+fn rev_range(from: Int, to: Int) -> SkipRange {
+    from := from - 1;
+    to := to - 1;
+
+    return SkipRange(*to, *from, -1);
+}
+
+fn irange(from: Int, to: Int, skip: Int) -> SkipRange {
+    if skip > 0 {
+        return SkipRange(*from, *to + 1, *skip);
+    }
+
+    return SkipRange(*from, *to - 1, *skip);
+}
+
+fn rev(r: Range) -> SkipRange {
+    return rev_range(move(r.current()), move(r.end()));
 }
