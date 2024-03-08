@@ -1,7 +1,7 @@
 ---
 module_name: hashset
 version: 0.1.0
-hash: 3f9453253a33bdc839efef41877b4309
+hash: 6bb6fcc9ada59b32aa280ef91a5c60cd
 module_paths:
   - "${MODULES_PATH}"
 modules:

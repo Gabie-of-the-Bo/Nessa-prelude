@@ -5,7 +5,7 @@ import * from array_extensions;
 
 // Syntax
 
-syntax hashset_initialization from '<' {' '} Arg(<type>, type) {' '} '>' {' '} '{' {' '} [{Arg(<expr>, elems) ',' {' '}} Arg(<expr>, elems)] {' '} '}' {
+syntax hashset_initialization from "<" [s] Arg(<type>, type) [s] ">" [s] "{" [s] [{Arg(<expr>, elems) "," [s]} Arg(<expr>, elems)] [s] "}" {
     {#let res = hashset<} {$type} {#>(} {#);\n}
     {@i in $elems} {
         {#res.add(} {$i} {#);\n}

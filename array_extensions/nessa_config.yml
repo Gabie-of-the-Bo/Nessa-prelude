@@ -1,7 +1,7 @@
 ---
 module_name: array_extensions
 version: 0.1.0
-hash: adfe0e94dd24e8fdbd8b5324c2e81144
+hash: 1958feab433326184678cb21f88e4da1
 module_paths:
   - "${MODULES_PATH}"
 modules: {}

@@ -1,7 +1,7 @@
 ---
 module_name: hashmap
 version: 0.1.0
-hash: a2ae15d5323b45482fec6b081a25b9b3
+hash: fec08d451fcd097e6527be6c5db1417f
 module_paths:
   - "${MODULES_PATH}"
 modules:

@@ -1,7 +1,7 @@
 ---
 module_name: math
 version: 0.1.0
-hash: 81c4f5e29445fafd9753fe1748b4650a
+hash: 212a36dc71f38809c7d4ac05495fc091
 module_paths:
   - "${MODULES_PATH}"
 modules:

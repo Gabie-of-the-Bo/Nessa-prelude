@@ -5,10 +5,10 @@ import fn { iterator, next, is_consumed, range } from range;
 // Syntax definition
 
 syntax hashmap_initialization from 
-    '<' {' '} Arg(<type>, ktype) {' '} ',' {' '} Arg(<type>, vtype) {' '} '>' {' '} 
-    '{' {' '} 
-        [{Arg(<expr>, keys) {' '} ':' {' '} Arg(<expr>, values) {' '} ',' {' '}} Arg(<expr>, keys) {' '} ':' {' '} Arg(<expr>, values)] 
-    {' '} '}' 
+    "<" [s] Arg(<type>, ktype) [s] "," [s] Arg(<type>, vtype) [s] ">" [s] 
+    "{" [s] 
+        [{Arg(<expr>, keys) [s] ":" [s] Arg(<expr>, values) [s] "," [s]} Arg(<expr>, keys) [s] ":" [s] Arg(<expr>, values)] 
+    [s] "}" 
 {
     // Create key and value arrays
     {#let keys = arr<} {$ktype} {#>(}{#);}
