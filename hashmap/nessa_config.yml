@@ -1,16 +1,16 @@
 ---
 module_name: hashmap
 version: 0.1.0
-hash: fec08d451fcd097e6527be6c5db1417f
+hash: 22e9fa65b24721dbbba4ad27b7f93ba7
 module_paths:
   - "${MODULES_PATH}"
 modules:
+  array_extensions:
+    path: "${MODULES_PATH}/array_extensions"
+    version: 0.1.0
   hash:
     path: "${MODULES_PATH}/hash"
     version: 0.1.0
   range:
     path: "${MODULES_PATH}/range"
-    version: 0.1.0
-  array_extensions:
-    path: "${MODULES_PATH}/array_extensions"
     version: 0.1.0

@@ -1,15 +1,15 @@
 ---
 module_name: hashset
 version: 0.1.0
-hash: 6bb6fcc9ada59b32aa280ef91a5c60cd
+hash: b2c5253e41abbef92c418966e248ad01
 module_paths:
   - "${MODULES_PATH}"
 modules:
-  hash:
-    path: "${MODULES_PATH}/hash"
-    version: 0.1.0
   array_extensions:
     path: "${MODULES_PATH}/array_extensions"
+    version: 0.1.0
+  hash:
+    path: "${MODULES_PATH}/hash"
     version: 0.1.0
   range:
     path: "${MODULES_PATH}/range"

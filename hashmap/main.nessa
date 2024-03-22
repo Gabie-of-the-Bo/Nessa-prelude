@@ -10,35 +10,13 @@ syntax hashmap_initialization from
         [{Arg(<expr>, keys) [s] ":" [s] Arg(<expr>, values) [s] "," [s]} Arg(<expr>, keys) [s] ":" [s] Arg(<expr>, values)] 
     [s] "}" 
 {
-    // Create key and value arrays
-    {#let keys = arr<} {$ktype} {#>(}{#);}
-    {#let values = arr<} {$vtype} {#>(}{#);}
+    let res = hashmap<$ktype, $vtype>();
 
-    {@i in $keys} {
-        {#keys.push(} {$i} {#);\n}
+    @values.i {
+        res.add($keys.i, $values.i);
     }
-
-    {@i in $values} {
-        {#values.push(} {$i} {#);\n}
-    }
-
-    // Create hashmap and populate
-    {#let res = hashmap<} {$ktype} {#, } {$vtype} {#>(}{#);}
     
-    {#
-        let idx = 0;
-        let length = values.len();
-
-        while idx < length \{
-    }
-        // Be sure to fwd the values with the correct types
-        {#res.add(fwd<} {$ktype} {#>(keys[*idx]), fwd<} {$vtype} {#>(values[*idx]));}
-        {#idx.inc();}
-    {#
-        \}
-    }
-
-    {#return move(res);}
+    return move(res);
 }
 
 // Class definition
