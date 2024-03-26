@@ -187,6 +187,72 @@ fn<T> reduce(array: @Array<'T>, base: 'T, op: ('T, 'T) => 'T) -> 'T {
     return move(base);
 }
 
+fn<T> partition(array: @Array<'T>, low: Int, high: Int) -> Int {
+    let pivot = *low;
+
+    for i in range(low + 1, *high) {
+        if array[*i] <= array[*low] {
+            pivot.inc();
+
+            if i != pivot {
+                swap(array[*i], array[*pivot]);
+            }
+        }
+    }
+
+    if pivot != low {
+        swap(array[*pivot], array[*low]);
+    }
+
+    return *pivot;
+}
+
+fn<T> partition_by(array: @Array<'T>, low: Int, high: Int, crit: (&'T) => Float) -> Int {
+    let pivot = *low;
+
+    for i in range(low + 1, *high) {
+        if crit(array[*i].demut()) <= crit(array[*low].demut()) {
+            pivot.inc();
+
+            if i != pivot {
+                swap(array[*i], array[*pivot]);
+            }
+        }
+    }
+
+    if pivot != low {
+        swap(array[*pivot], array[*low]);
+    }
+
+    return *pivot;
+}
+
+fn<T> quicksort_rec(array: @Array<'T>, low: Int, high: Int) {
+    if low < high {
+        let pi = partition(array, *low, *high);
+
+        quicksort_rec(array, *low, *pi);
+        quicksort_rec(array, *pi + 1, *high);
+    }
+}
+
+fn<T> quicksort_rec_by(array: @Array<'T>, low: Int, high: Int, crit: (&'T) => Float) {
+    if low < high {
+        let pi = partition_by(array, *low, *high, *crit);
+
+        quicksort_rec_by(array, *low, *pi, *crit);
+        quicksort_rec_by(array, *pi + 1, *high, *crit);
+    }
+}
+
+fn<T> sort(array: @Array<'T>) {
+    quicksort_rec(array, 0, array.len());
+}
+
+fn<T> sort_by(array: @Array<'T>, crit: (&'T) => Float) {
+    quicksort_rec_by(array, 0, array.len(), *crit);
+}
+
 // Printable interface
 
 fn<T> print(array: Array<'T [Printable]>) {
