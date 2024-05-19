@@ -1,7 +1,10 @@
 ---
 module_name: array_extensions
 version: 0.1.0
-hash: 3475f6a60331b2ad93a8f38048813767
+hash: 32bb408e7cb0fc9cdaa20f622b20d571
 module_paths:
   - "${MODULES_PATH}"
-modules: {}
+modules:
+  range:
+    path: "${MODULES_PATH}/prelude/range"
+    version: 0.1.0
