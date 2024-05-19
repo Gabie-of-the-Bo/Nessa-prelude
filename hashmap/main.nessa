@@ -4,6 +4,9 @@ import fn { iterator, next, is_consumed, range } from range;
 
 // Syntax definition
 
+@doc(
+    "Hash Map initialization syntax."
+)
 syntax hashmap_initialization from 
     "<" [s] Arg(<type>, ktype) [s] "," [s] Arg(<type>, vtype) [s] ">" [s] 
     "{" [s] 
@@ -21,6 +24,9 @@ syntax hashmap_initialization from
 
 // Class definition
 
+@doc(
+    "Hash Map class that works as an associative array."
+)
 class HashMap<V, K> {
     buckets: Array<Array<('V [Hashable], 'K)>>;
     num_elems: Int;
@@ -35,6 +41,10 @@ fn<K, V> init(map: @HashMap<'K [Hashable], 'V>, size: Int) {
     }
 }
 
+@doc(
+    "Create empty Hash Map. Use this instead of HashMap's constructor.",
+    "An empty Hash Map"
+)
 fn<K, V> hashmap() -> HashMap<'K [Hashable], 'V> {
     let res = HashMap(arr<Array<('K, 'V)>>(), 0);
     res.init(10);
@@ -58,6 +68,13 @@ fn<K, V> rehash(map: @HashMap<'K [Hashable], 'V>) {
     map.buckets() := move(aux.buckets());
 }
 
+@doc(
+    "Adds the (`key`, `value`) pair to `map`.",
+    map: "HashMap to modify",
+    key: "`key` to add",
+    value: "`value` to add",
+    "Nothing."
+)
 fn<K, V> add(map: @HashMap<'K [Hashable], 'V>, key: 'K, value: 'V) {
     let b = map.buckets();
     let size = b.len();
@@ -88,6 +105,12 @@ fn<K, V> add(map: @HashMap<'K [Hashable], 'V>, key: 'K, value: 'V) {
     }
 }
 
+@doc(
+    "Removes `key` from `map`.",
+    map: "HashMap to modify",
+    key: "`key` to remove",
+    "Nothing."
+)
 fn<K, V> remove(map: @HashMap<'K [Hashable], 'V>, key: 'K) {
     let b = map.buckets();
     let size = b.len();
@@ -111,6 +134,12 @@ fn<K, V> remove(map: @HashMap<'K [Hashable], 'V>, key: 'K) {
     }
 }
 
+@doc(
+    "Gets the value associated to `key` in `map`.",
+    map: "HashMap to fetch",
+    key: "`key` to look for",
+    "The associated value or an empty value."
+)
 fn<K, V> get(map: @HashMap<'K [Hashable], 'V>, key: @'K) -> () | @'V {
     let b = map.buckets();
     let size = b.len();
@@ -125,6 +154,12 @@ fn<K, V> get(map: @HashMap<'K [Hashable], 'V>, key: @'K) -> () | @'V {
     return ();
 }
 
+@doc(
+    "Checks whether or not `key` has an associated value in `map`.",
+    map: "HashMap to fetch",
+    key: "`key` to look for",
+    "`true` if `map` contains `key`, else `false`."
+)
 fn<K, V> contains(map: @HashMap<'K [Hashable], 'V>, key: @'K) -> Bool {
     let b = map.buckets();
     let size = b.len();
@@ -139,6 +174,11 @@ fn<K, V> contains(map: @HashMap<'K [Hashable], 'V>, key: @'K) -> Bool {
     return false;
 }
 
+@doc(
+    "Returns the number of elements in the `map`.",
+    map: "HashMap to check",
+    "The number of elements in the `map`."
+)
 fn<K, V> len(map: &HashMap<'K [Hashable], 'V>) -> Int {
     return *map.num_elems();
 }
@@ -239,3 +279,64 @@ fn<K, V> print(map: @HashMap<'K [Printable], 'V [Printable]>) {
 
 implement<K, V> Printable for @HashMap<'K [Printable], 'V [Printable]>;
 implement<K, V> Printable for &HashMap<'K [Printable], 'V [Printable]>;
+
+/*
+    UNIT TESTS
+*/
+
+@test
+fn hashmap_syntax_test() -> Bool {
+    let res = <Int, String>{
+        1: "Test 1",
+        7: "Test 2",
+        2: "Test 3"
+    };
+    
+    return res.contains(1.mut()) && res.get(1.mut()).as<@String>() == "Test 1" &&
+           res.contains(2.mut()) && res.get(2.mut()).as<@String>() == "Test 3" &&
+           res.contains(7.mut()) && res.get(7.mut()).as<@String>() == "Test 2";
+}
+
+@test
+fn hashmap_add_test() -> Bool {
+    let res = hashmap<Int, String>();
+
+    for i in range(100) {
+        res.add(*i, "Test " + i.deref().to_string());
+    }
+
+    for i in range(100) {
+        if !res.contains(i) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+@test
+fn hashmap_remove_test() -> Bool {
+    let res = hashmap<Int, String>();
+
+    for i in range(100) {
+        res.add(*i, "Test " + i.deref().to_string());
+    }
+
+    for i in range(50, 100) {
+        res.remove(*i);
+    }
+
+    for i in range(50) {
+        if !res.contains(i) {
+            return false;
+        }
+    }
+
+    for i in range(50, 100) {
+        if res.contains(i) {
+            return false;
+        }
+    }
+    
+    return true;
+}
