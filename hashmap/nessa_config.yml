@@ -1,16 +1,16 @@
 ---
 module_name: hashmap
 version: 0.1.0
-hash: 83f9a17f70c0573351278fb3d9bd248a
+hash: 1b25e00b35fe5d6264fa307db8848d11
 module_paths:
   - "${MODULES_PATH}"
 modules:
-  hash:
-    path: "${MODULES_PATH}/prelude/hash"
-    version: 0.1.0
   array_extensions:
     path: "${MODULES_PATH}/prelude/array_extensions"
     version: 0.1.0
   range:
     path: "${MODULES_PATH}/prelude/range"
+    version: 0.1.0
+  hash:
+    path: "${MODULES_PATH}/prelude/hash"
     version: 0.1.0

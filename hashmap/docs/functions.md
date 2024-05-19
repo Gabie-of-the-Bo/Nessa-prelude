@@ -7,10 +7,10 @@
 * `map`: HashMap to check
 
 ### Description
-Returns the number of elements in the `map`.
+Returns the number of elements in `map`.
 
 ### Return
-The number of elements in the `map`.
+The number of elements in `map`.
 
 ## <span style="color: rgb(197, 134, 192);">fn</span> <span style="color: rgb(220, 220, 170);">remove</span>&lt;<span style="color: rgb(86, 156, 214);">T_0</span>, <span style="color: rgb(86, 156, 214);">T_1</span>&gt;(<span style="color: rgb(197, 134, 192);">@</span><span style="color: rgb(78, 201, 176);">HashMap</span>&lt;<span style="color: rgb(86, 156, 214);">'T_0</span> [[32mHashable[0m], <span style="color: rgb(86, 156, 214);">'T_1</span>&gt;, <span style="color: rgb(86, 156, 214);">'T_0</span>) -> ()
 

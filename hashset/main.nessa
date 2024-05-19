@@ -5,6 +5,9 @@ import * from array_extensions;
 
 // Syntax
 
+@doc(
+    "Hash Set initialization syntax."
+)
 syntax hashset_initialization from "<" [s] Arg(<type>, type) [s] ">" [s] "{" [s] [{Arg(<expr>, elems) "," [s]} Arg(<expr>, elems)] [s] "}" {
     let res = hashset<$type>();
 
@@ -17,6 +20,9 @@ syntax hashset_initialization from "<" [s] Arg(<type>, type) [s] ">" [s] "{" [s]
 
 // Class definition
 
+@doc(
+    "Hash Set class."
+)
 class HashSet<V> {
     buckets: Array<Array<'V [Hashable]>>;
     num_elems: Int;
@@ -31,6 +37,10 @@ fn<T> init(set: @HashSet<'T [Hashable]>, size: Int) {
     }
 }
 
+@doc(
+    "Create empty Hash Set. Use this instead of HashSet's constructor.",
+    "An empty Hash Set"
+)
 fn<T> hashset() -> HashSet<'T [Hashable]> {
     let res = HashSet(arr<Array<'T>>(), 0);
     res.init(10);
@@ -54,10 +64,16 @@ fn<T> rehash(set: @HashSet<'T [Hashable]>) {
     set.buckets() := move(aux.buckets());
 }
 
+@doc(
+    "Adds `elem` to `set`.",
+    set: "HashSet to modify",
+    elem: "element to add",
+    "Nothing."
+)
 fn<T> add(set: @HashSet<'T [Hashable]>, elem: 'T) {
     let b = set.buckets();
     let size = b.len();
-    let pos = hash(*elem) % size;
+    let pos = abs(hash(*elem)) % size;
     let bucket = b[*pos];
 
     if !bucket.demut().contains(elem.demut()) {
@@ -70,9 +86,15 @@ fn<T> add(set: @HashSet<'T [Hashable]>, elem: 'T) {
     }
 }
 
+@doc(
+    "Removes `elem` from `set`.",
+    set: "HashSet to modify",
+    elem: "element to remove",
+    "Nothing."
+)
 fn<T> remove(set: @HashSet<'T [Hashable]>, elem: &'T) {
     let b = set.buckets();
-    let pos = hash(*elem) % b.len();
+    let pos = abs(hash(*elem)) % b.len();
     let bucket = b[*pos];
     let idx = bucket.demut().index_of(elem);
 
@@ -82,10 +104,16 @@ fn<T> remove(set: @HashSet<'T [Hashable]>, elem: &'T) {
     }
 }
 
+@doc(
+    "Checks whether or not `elem` is in `set`.",
+    set: "HashSet to fetch",
+    elem: "`elem` to look for",
+    "`true` if `set` contains `elem`, else `false`."
+)
 fn<T> contains(set: &HashSet<'T [Hashable]>, elem: &'T) -> Bool {
     let b = set.buckets();
     let size = b.len();
-    let pos = hash(*elem) % size;
+    let pos = abs(hash(*elem)) % size;
 
     for i in b[*pos] {
         if i == elem {
@@ -96,6 +124,11 @@ fn<T> contains(set: &HashSet<'T [Hashable]>, elem: &'T) -> Bool {
     return false;
 }
 
+@doc(
+    "Returns the number of elements in `set`.",
+    set: "HashSet to check",
+    "The number of elements in `set`."
+)
 fn<T> len(set: &HashSet<'T [Hashable]>) -> Int {
     return *set.num_elems();
 }
@@ -194,3 +227,58 @@ fn<T> print(set: @HashSet<'T [Printable]>) {
 
 implement<T> Printable for @HashSet<'T [Printable]>;
 implement<T> Printable for &HashSet<'T [Printable]>;
+
+/*
+    UNIT TESTS
+*/
+
+@test
+fn hashset_syntax_test() -> Bool {
+    let res = <Int>{1, 7, 2};
+    
+    return res.demut().contains(1.ref()) && res.demut().contains(2.ref()) && res.demut().contains(7.ref());
+}
+
+@test
+fn hashset_add_test() -> Bool {
+    let res = hashset<Int>();
+
+    for i in range(100) {
+        res.add(*i);
+    }
+
+    for i in range(100) {
+        if !res.demut().contains(i.demut()) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+@test
+fn hashset_remove_test() -> Bool {
+    let res = hashset<Int>();
+
+    for i in range(100) {
+        res.add(*i);
+    }
+
+    for i in range(50, 100) {
+        res.remove(i.demut());
+    }
+
+    for i in range(50) {
+        if !res.demut().contains(i.demut()) {
+            return false;
+        }
+    }
+
+    for i in range(50, 100) {
+        if res.demut().contains(i.demut()) {
+            return false;
+        }
+    }
+    
+    return true;
+}

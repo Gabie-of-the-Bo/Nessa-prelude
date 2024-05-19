@@ -175,9 +175,9 @@ fn<K, V> contains(map: @HashMap<'K [Hashable], 'V>, key: @'K) -> Bool {
 }
 
 @doc(
-    "Returns the number of elements in the `map`.",
+    "Returns the number of elements in `map`.",
     map: "HashMap to check",
-    "The number of elements in the `map`."
+    "The number of elements in `map`."
 )
 fn<K, V> len(map: &HashMap<'K [Hashable], 'V>) -> Int {
     return *map.num_elems();
