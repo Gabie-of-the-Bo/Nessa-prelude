@@ -1,5 +1,10 @@
 // Simple range
 
+@doc(
+    "Class that represents a lazy range of values.",
+    current: "Current integer.",
+    end: "Final value to iterate."
+)
 class Range {
     current: Int;
     end: Int;
@@ -10,36 +15,64 @@ fn iterator(it: Range) -> Range {
 }
 
 fn next(it: @Range) -> Int {
-    let curr: @Int = it.current();
+    let curr: @Int = it.current;
     curr.inc();
 
     return *curr - 1;
 }
 
 fn is_consumed(it: @Range) -> Bool {
-    return it.current() >= it.end();
+    return it.current >= it.end;
 }
 
 implement Iterable<Range, Int> for Range;
 
+@doc(
+    "Returns a range from 0 to `to` (last value not included).",
+    to: "Final value to iterate.",
+    "The Range value."
+)
 fn range(to: Int) -> Range {
     return Range(0, *to);
 }
 
+@doc(
+    "Returns a range from 'from' to `to` (last value not included).",
+    from: "Starting value.",
+    to: "Final value to iterate.",
+    "The Range value."
+)
 fn range(from: Int, to: Int) -> Range {
     return Range(*from, *to);
 }
 
+@doc(
+    "Returns a range from 0 to `to` (last value included).",
+    to: "Final value to iterate.",
+    "The Range value."
+)
 fn irange(to: Int) -> Range {
     return Range(0, *to + 1);
 }
 
+@doc(
+    "Returns a range from 'from' to `to` (last value included).",
+    from: "Starting value.",
+    to: "Final value to iterate.",
+    "The Range value."
+)
 fn irange(from: Int, to: Int) -> Range {
     return Range(*from, *to + 1);
 }
 
 // Skip range
 
+@doc(
+    "Class that represents a lazy range of values with a skip value.",
+    current: "Current integer.",
+    end: "Final value to iterate.",
+    skip: "Number of values to skip on each iteration."
+)
 class SkipRange {
     current: Int;
     end: Int;
@@ -51,30 +84,48 @@ fn iterator(it: SkipRange) -> SkipRange {
 }
 
 fn next(it: @SkipRange) -> Int {
-    let curr: @Int = it.current();
-    curr := curr + it.skip();
+    let curr: @Int = it.current;
+    curr := curr + it.skip;
 
-    return *curr - it.skip();
+    return *curr - it.skip;
 }
 
 fn is_consumed(it: @SkipRange) -> Bool {
-    if it.skip() > 0 {
-        return it.current() >= it.end();
+    if it.skip > 0 {
+        return it.current >= it.end;
     }
     
-    return it.current() <= it.end();
+    return it.current <= it.end;
 }
 
 implement Iterable<SkipRange, Int> for SkipRange;
 
+@doc(
+    "Returns a range from 'from' to `to` (last value included).",
+    from: "Starting value.",
+    to: "Final value to iterate.",
+    skip: "Number of values to skip on each iteration.",
+    "The Range value."
+)
 fn range(from: Int, to: Int, skip: Int) -> SkipRange {
     return SkipRange(*from, *to, *skip);
 }
 
+@doc(
+    "Returns a range from `to` - 1 to 0 (last value included).",
+    to: "Inital value to iterate.",
+    "The Range value."
+)
 fn rev_range(to: Int) -> SkipRange {
     return rev_range(0, move(to));
 }
 
+@doc(
+    "Returns a range from `to` - 1 to 'from' (last value included).",
+    from: "Starting value.",
+    to: "Final value to iterate.",
+    "The Range value."
+)
 fn rev_range(from: Int, to: Int) -> SkipRange {
     from := from - 1;
     to := to - 1;
@@ -82,6 +133,13 @@ fn rev_range(from: Int, to: Int) -> SkipRange {
     return SkipRange(*to, *from, -1);
 }
 
+@doc(
+    "Returns a range from 'from' to `to` (last value included) with a skip value.",
+    from: "Starting value.",
+    to: "Final value to iterate.",
+    skip: "Number of values to skip on each iteration.",
+    "The Range value."
+)
 fn irange(from: Int, to: Int, skip: Int) -> SkipRange {
     if skip > 0 {
         return SkipRange(*from, *to + 1, *skip);
@@ -90,6 +148,125 @@ fn irange(from: Int, to: Int, skip: Int) -> SkipRange {
     return SkipRange(*from, *to - 1, *skip);
 }
 
+@doc(
+    "Returns reversed range.",
+    r: "Range to reverse.",
+    "The reversed Range value."
+)
 fn rev(r: Range) -> SkipRange {
-    return rev_range(move(r.current()), move(r.end()));
+    return rev_range(move(r.current), move(r.end));
+}
+
+/*
+    UNIT TESTS
+*/
+
+@test
+fn range_test_1() -> Bool {
+    let sum = 0;
+
+    for i in range(10) {
+        sum = sum + i;
+    }
+
+    return sum == 45;
+}
+
+@test
+fn range_test_2() -> Bool {
+    let sum = 0;
+
+    for i in range(10, 20) {
+        sum = sum + i;
+    }
+
+    return sum == 145;
+}
+
+@test
+fn range_test_3() -> Bool {
+    let sum = 0;
+
+    for i in range(0, 20, 2) {
+        sum = sum + i;
+    }
+
+    return sum == 90;
+}
+
+@test
+fn irange_test_1() -> Bool {
+    let sum = 0;
+
+    for i in irange(10) {
+        sum = sum + i;
+    }
+
+    return sum == 55;
+}
+
+@test
+fn irange_test_2() -> Bool {
+    let sum = 0;
+
+    for i in irange(10, 20) {
+        sum = sum + i;
+    }
+
+    return sum == 165;
+}
+
+@test
+fn irange_test_3() -> Bool {
+    let sum = 0;
+
+    for i in irange(0, 20, 2) {
+        sum = sum + i;
+    }
+
+    return sum == 110;
+}
+
+@test
+fn rev_range_test_1() -> Bool {
+    let sum = 0;
+
+    for i in range(10).rev() {
+        sum = sum + i;
+    }
+
+    return sum == 45;
+}
+
+@test
+fn rev_range_test_2() -> Bool {
+    let sum = 0;
+
+    for i in range(10, 20).rev() {
+        sum = sum + i;
+    }
+
+    return sum == 145;
+}
+
+@test
+fn rev_irange_test_1() -> Bool {
+    let sum = 0;
+
+    for i in irange(10).rev() {
+        sum = sum + i;
+    }
+
+    return sum == 55;
+}
+
+@test
+fn rev_irange_test_2() -> Bool {
+    let sum = 0;
+
+    for i in irange(10, 20).rev() {
+        sum = sum + i;
+    }
+
+    return sum == 165;
 }

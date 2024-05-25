@@ -1,16 +1,16 @@
 ---
 module_name: hashset
 version: 0.1.0
-hash: 401834d10278a3a4c7d431074874639c
+hash: 3d74f39ccbc9954e1d8632eece7d0ee8
 module_paths:
   - "${MODULES_PATH}"
 modules:
   range:
     path: "${MODULES_PATH}/prelude/range"
     version: 0.1.0
-  array_extensions:
-    path: "${MODULES_PATH}/prelude/array_extensions"
-    version: 0.1.0
   hash:
     path: "${MODULES_PATH}/prelude/hash"
+    version: 0.1.0
+  array_extensions:
+    path: "${MODULES_PATH}/prelude/array_extensions"
     version: 0.1.0

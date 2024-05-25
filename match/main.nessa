@@ -1,3 +1,6 @@
+@doc(
+    "Match syntax."
+)
 syntax expr match from "match" s Arg(<expr>, ex) [s] 
     "{" 
         [s] Arg([<ident> [s] ":" [s]], n) Arg(<type>, ts) [s] "=>" [s] Arg(<expr>, es) [s]
@@ -22,4 +25,21 @@ syntax expr match from "match" s Arg(<expr>, ex) [s]
 
         return $fe;
     \}
+}
+
+/*
+    UNIT TESTS
+*/
+
+@test
+fn range_test() -> Bool {
+    let test = (obj: *) -> Int {
+        return match *obj { 
+            n: Int => n * 2, 
+            s: String => s.len() * 2,
+            _ => 2
+        };
+    };
+    
+    return test(10) == 20 || test(50) == 100 || test("Test") == 8 || test(0.5) == 2;
 }

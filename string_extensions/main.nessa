@@ -2,6 +2,11 @@ import * from array_extensions;
 
 // Code point iterator
 
+@doc(
+    "Iterator over code points in a String.",
+    str: "Reference to the String that is being iterated.",
+    pos: "Current UTF-8 position being iterated."
+)
 class CodePointIterator {
     str: &String;
     pos: Int;
@@ -12,25 +17,36 @@ fn iterator(it: CodePointIterator) -> CodePointIterator {
 }
 
 fn next(it: @CodePointIterator) -> Int {
-    let res = it.str().code_point_at(*it.pos());
+    let res = it.str.code_point_at(*it.pos);
 
-    it.pos() := it.pos() + res.deref().code_point_length();
+    it.pos := it.pos + res.deref().code_point_length();
 
     return move(res);
 }
 
 fn is_consumed(it: @CodePointIterator) -> Bool {
-    return it.pos() >= it.str().len();
+    return it.pos >= it.str.len();
 }
 
 implement Iterable<CodePointIterator, Int> for CodePointIterator;
 
+@doc(
+    "Get an iterator over code points.",
+    str: "Reference to the String that you want to iterate.",
+    "A CodePointIterator over `str`."
+)
 fn code_points(str: &String) -> CodePointIterator {
     return CodePointIterator(str, 0);
 }
 
 // Algorithms
 
+@doc(
+    "Checks whether or not `iter` starts with `start`.",
+    iter: "Iterator to check.",
+    start: "Start substring to check.",
+    "`true` if `iter` starts with `start`, else `false`."
+)
 fn starts_with(iter: CodePointIterator, start: &String) -> Bool {
     let start_cp = start.code_points();
 
@@ -49,10 +65,22 @@ fn starts_with(iter: CodePointIterator, start: &String) -> Bool {
     return start_cp.is_consumed();
 }
 
+@doc(
+    "Checks whether or not `str` starts with `start`.",
+    str: "String to check.",
+    start: "Start substring to check.",
+    "`true` if `iter` starts with `start`, else `false`."
+)
 fn starts_with(str: &String, start: &String) -> Bool {
     return starts_with(str.code_points(), start);
 }
 
+@doc(
+    "Checks whether or not `str` contains `haystack`.",
+    str: "String to check.",
+    haystack: "Substring to check.",
+    "`true` if `iter` contains `haystack`, else `false`."
+)
 fn contains(str: &String, haystack: &String) -> Bool {
     let str_cp = str.code_points();
 
@@ -67,6 +95,13 @@ fn contains(str: &String, haystack: &String) -> Bool {
     return false;
 }
 
+@doc(
+    "Replace `haystack` in `str` by `rep`. It allocates another String.",
+    str: "String to modify.",
+    haystack: "Substring to check.",
+    rep: "String to use when replacing `haystack`.",
+    "The modified string."
+)
 fn replace(str: &String, haystack: &String, rep: String) -> String {
     let res = arr_with_capacity<Int>(str.len());
     let str_cp = str.code_points();
@@ -85,4 +120,45 @@ fn replace(str: &String, haystack: &String, rep: String) -> String {
     }
 
     return utf8_to_str(res);
+}
+
+/*
+    UNIT TESTS
+*/
+
+@test
+fn test_cp_iterator() -> Bool {
+    let str = "Test";
+    let it = str.demut().code_points();
+    
+    return next(it) == 'T' && next(it) == 'e' &&
+           next(it) == 's' && next(it) == 't';
+}
+
+@test
+fn test_starts_with() -> Bool {
+    let str = "Test";
+    let it = str.demut().code_points();
+    
+    return it.deref().starts_with("Te".ref()) &&
+           !it.deref().starts_with("st".ref()) &&
+           str.demut().starts_with("Te".ref()) &&
+           !str.demut().starts_with("st".ref());
+}
+
+@test
+fn test_contains() -> Bool {
+    let str = "This is a test";    
+    
+    return str.demut().contains("This".ref()) &&
+           str.demut().contains("is a".ref()) &&
+           !str.demut().contains("not".ref());
+}
+
+@test
+fn test_replace() -> Bool {
+    let str = "This is a test";
+    let new = str.demut().replace("test".ref(), "not a test");
+
+    return new == "This is a not a test";
 }

@@ -33,7 +33,7 @@ class HashMap<V, K> {
 }
 
 fn<K, V> init(map: @HashMap<'K [Hashable], 'V>, size: Int) {
-    let _buckets = map.buckets();
+    let _buckets = map.buckets;
     _buckets.reserve(*size);
 
     for i in range(0, *size) {
@@ -53,19 +53,19 @@ fn<K, V> hashmap() -> HashMap<'K [Hashable], 'V> {
 }
 
 fn<K, V> rehash(map: @HashMap<'K [Hashable], 'V>) {
-    let b = map.buckets();
+    let b = map.buckets;
     let size = b.len();
 
     let aux = HashMap(arr<Array<('K, 'V)>>(), 0);
     aux.init(size * 2);
 
-    for bucket in map.buckets() {
+    for bucket in map.buckets {
         for elem in bucket {
             aux.add(move(elem.get_0()), move(elem.get_1()));
         }
     }
 
-    map.buckets() := move(aux.buckets());
+    map.buckets := move(aux.buckets);
 }
 
 @doc(
@@ -76,7 +76,7 @@ fn<K, V> rehash(map: @HashMap<'K [Hashable], 'V>) {
     "Nothing."
 )
 fn<K, V> add(map: @HashMap<'K [Hashable], 'V>, key: 'K, value: 'V) {
-    let b = map.buckets();
+    let b = map.buckets;
     let size = b.len();
     let pos = hash(*key) % size;
     let bucket = b[*pos];
@@ -94,7 +94,7 @@ fn<K, V> add(map: @HashMap<'K [Hashable], 'V>, key: 'K, value: 'V) {
 
     if idx == -1 {
         bucket.push((move(key), move(value)));
-        map.num_elems().inc();
+        map.num_elems.inc();
 
     } else {
         bucket.set((move(key), move(value)), *idx);
@@ -112,7 +112,7 @@ fn<K, V> add(map: @HashMap<'K [Hashable], 'V>, key: 'K, value: 'V) {
     "Nothing."
 )
 fn<K, V> remove(map: @HashMap<'K [Hashable], 'V>, key: 'K) {
-    let b = map.buckets();
+    let b = map.buckets;
     let size = b.len();
     let pos = hash(*key) % size;
     let bucket = b[*pos];
@@ -130,7 +130,7 @@ fn<K, V> remove(map: @HashMap<'K [Hashable], 'V>, key: 'K) {
 
     if idx != -1 {
         bucket.remove(*idx);
-        map.num_elems().dec();
+        map.num_elems.dec();
     }
 }
 
@@ -141,7 +141,7 @@ fn<K, V> remove(map: @HashMap<'K [Hashable], 'V>, key: 'K) {
     "The associated value or an empty value."
 )
 fn<K, V> get(map: @HashMap<'K [Hashable], 'V>, key: @'K) -> () | @'V {
-    let b = map.buckets();
+    let b = map.buckets;
     let size = b.len();
     let pos = hash(*key) % size;
 
@@ -161,7 +161,7 @@ fn<K, V> get(map: @HashMap<'K [Hashable], 'V>, key: @'K) -> () | @'V {
     "`true` if `map` contains `key`, else `false`."
 )
 fn<K, V> contains(map: @HashMap<'K [Hashable], 'V>, key: @'K) -> Bool {
-    let b = map.buckets();
+    let b = map.buckets;
     let size = b.len();
     let pos = hash(*key) % size;
 
@@ -180,7 +180,7 @@ fn<K, V> contains(map: @HashMap<'K [Hashable], 'V>, key: @'K) -> Bool {
     "The number of elements in `map`."
 )
 fn<K, V> len(map: &HashMap<'K [Hashable], 'V>) -> Int {
-    return *map.num_elems();
+    return *map.num_elems;
 }
 
 // Iterator
@@ -200,18 +200,18 @@ fn<K, V> next(it: @HashMapIterator<'K, 'V>) -> ('K, 'V) {
     let i = it.idx();
     let s = it.map();
 
-    let curr_bucket = (s.buckets())[*b];
+    let curr_bucket = (s.buckets)[*b];
     let res = curr_bucket[*i];
 
     i.inc();
 
     if i == curr_bucket.len() {
-        let num_buckets = s.buckets().len();
+        let num_buckets = s.buckets.len();
         i := 0;
         b := b + 1;
 
         while b < num_buckets {
-            curr_bucket = (s.buckets())[*b];
+            curr_bucket = (s.buckets)[*b];
 
             if curr_bucket.len() > 0 {
                 return *res;
@@ -225,14 +225,14 @@ fn<K, V> next(it: @HashMapIterator<'K, 'V>) -> ('K, 'V) {
 }
 
 fn<K, V> is_consumed(it: @HashMapIterator<'K, 'V>) -> Bool {
-    return it.bucket() == it.map().buckets().len();
+    return it.bucket() == it.map().buckets.len();
 }
 
 fn<K, V> iterator(map: &HashMap<'K, 'V>) -> HashMapIterator<'K, 'V> {
     let idx = 0;
 
     // Get first nonempty bucket
-    for bucket in map.buckets() {
+    for bucket in map.buckets {
         if bucket.len() > 0 {
             return HashMapIterator(map, *idx, 0);
         }

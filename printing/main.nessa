@@ -1,3 +1,8 @@
+@doc(
+    "Print an object and then a newline.",
+    obj: "object to print",
+    "Nothing."
+)
 fn<T> println(obj: 'T [Printable]) {
     print(fwd<'T>(obj));
     print("\n");

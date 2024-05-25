@@ -29,7 +29,7 @@ class HashSet<V> {
 }
 
 fn<T> init(set: @HashSet<'T [Hashable]>, size: Int) {
-    let _buckets = set.buckets();
+    let _buckets = set.buckets;
     _buckets.reserve(*size);
 
     for i in range(0, *size) {
@@ -49,19 +49,19 @@ fn<T> hashset() -> HashSet<'T [Hashable]> {
 }
 
 fn<T> rehash(set: @HashSet<'T [Hashable]>) {
-    let b = set.buckets();
+    let b = set.buckets;
     let size = b.len();
 
     let aux = HashSet(arr<Array<'T>>(), 0);
     aux.init(size * 2);
 
-    for bucket in set.buckets() {
+    for bucket in set.buckets {
         for elem in bucket {
             aux.add(move(elem));
         }
     }
 
-    set.buckets() := move(aux.buckets());
+    set.buckets := move(aux.buckets);
 }
 
 @doc(
@@ -71,14 +71,14 @@ fn<T> rehash(set: @HashSet<'T [Hashable]>) {
     "Nothing."
 )
 fn<T> add(set: @HashSet<'T [Hashable]>, elem: 'T) {
-    let b = set.buckets();
+    let b = set.buckets;
     let size = b.len();
     let pos = abs(hash(*elem)) % size;
     let bucket = b[*pos];
 
     if !bucket.demut().contains(elem.demut()) {
         bucket.push(move(elem));
-        set.num_elems().inc();
+        set.num_elems.inc();
     }
 
     if b[*pos].len() > size {
@@ -93,14 +93,14 @@ fn<T> add(set: @HashSet<'T [Hashable]>, elem: 'T) {
     "Nothing."
 )
 fn<T> remove(set: @HashSet<'T [Hashable]>, elem: &'T) {
-    let b = set.buckets();
+    let b = set.buckets;
     let pos = abs(hash(*elem)) % b.len();
     let bucket = b[*pos];
     let idx = bucket.demut().index_of(elem);
 
     if idx != -1 {
         bucket.remove(*idx);
-        set.num_elems().dec();
+        set.num_elems.dec();
     }
 }
 
@@ -111,7 +111,7 @@ fn<T> remove(set: @HashSet<'T [Hashable]>, elem: &'T) {
     "`true` if `set` contains `elem`, else `false`."
 )
 fn<T> contains(set: &HashSet<'T [Hashable]>, elem: &'T) -> Bool {
-    let b = set.buckets();
+    let b = set.buckets;
     let size = b.len();
     let pos = abs(hash(*elem)) % size;
 
@@ -130,7 +130,7 @@ fn<T> contains(set: &HashSet<'T [Hashable]>, elem: &'T) -> Bool {
     "The number of elements in `set`."
 )
 fn<T> len(set: &HashSet<'T [Hashable]>) -> Int {
-    return *set.num_elems();
+    return *set.num_elems;
 }
 
 // Iterator
@@ -150,18 +150,18 @@ fn<T> next(it: @HashSetIterator<'T>) -> 'T {
     let i = it.idx();
     let s = it.set();
 
-    let curr_bucket = (s.buckets())[*b];
+    let curr_bucket = (s.buckets)[*b];
     let res = curr_bucket[*i];
 
     i.inc();
 
     if i == curr_bucket.len() {
-        let num_buckets = s.buckets().len();
+        let num_buckets = s.buckets.len();
         i := 0;
         b := b + 1;
 
         while b < num_buckets {
-            curr_bucket = (s.buckets())[*b];
+            curr_bucket = (s.buckets)[*b];
 
             if curr_bucket.len() > 0 {
                 return *res;
@@ -175,14 +175,14 @@ fn<T> next(it: @HashSetIterator<'T>) -> 'T {
 }
 
 fn<T> is_consumed(it: @HashSetIterator<'T>) -> Bool {
-    return it.bucket() == it.set().buckets().len();
+    return it.bucket() == it.set().buckets.len();
 }
 
 fn<T> iterator(set: &HashSet<'T>) -> HashSetIterator<'T> {
     let idx = 0;
 
     // Get first nonempty bucket
-    for bucket in set.buckets() {
+    for bucket in set.buckets {
         if bucket.len() > 0 {
             return HashSetIterator(set, *idx, 0);
         }

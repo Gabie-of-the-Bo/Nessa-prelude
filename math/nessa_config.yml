@@ -1,10 +1,10 @@
 ---
 module_name: math
 version: 0.1.0
-hash: 212a36dc71f38809c7d4ac05495fc091
+hash: ca5e2ceada78d6f2550d8c6eed6be8b8
 module_paths:
   - "${MODULES_PATH}"
 modules:
   range:
-    path: "${MODULES_PATH}/range"
+    path: "${MODULES_PATH}/prelude/range"
     version: 0.1.0

@@ -1,7 +1,7 @@
 ---
 module_name: iterators
 version: 0.1.0
-hash: e05334863a16c31b81b2d6d64c167eb4
+hash: eb35a5a91dc7e3da2d8ec07326594217
 module_paths:
-  - ${MODULES_PATH}
+  - "${MODULES_PATH}"
 modules: {}

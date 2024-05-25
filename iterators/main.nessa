@@ -12,14 +12,20 @@ fn<It, Elem, Trf> iterator(it: MapIterator<'It, 'Elem, 'Trf>) -> MapIterator<'It
 }
 
 fn<It, Elem, Trf> next(it: @MapIterator<'It, 'Elem, 'Trf>) -> 'Trf {
-    let fnc = it.f();
-    return fnc(it.iter().next());
+    let fnc = it.f;
+    return fnc(it.iter.next());
 }
 
 fn<It, Elem, Trf> is_consumed(it: @MapIterator<'It, 'Elem, 'Trf>) -> Bool {
-    return it.iter().is_consumed();
+    return it.iter.is_consumed();
 }
 
+@doc(
+    "Returns an iterator that maps the elements of `iter` using the function `f`.",
+    it: "The iterator to map.",
+    f: "The function to use in order to map the elements of `it`.",
+    "The mapping iterator."
+)
 fn<Cont, It, Elem, Trf> map(it: 'Cont [Iterable<'It, 'Elem>], f: 'Elem => 'Trf) -> MapIterator<'It, 'Elem, 'Trf> {
     return MapIterator(iterator(move(it)), move(f));
 }
@@ -38,18 +44,18 @@ class FilterIterator<It, Elem> {
 }
 
 fn<It, Elem> advance_till_true(it: @FilterIterator<'It, 'Elem>) {
-    let fnc = it.f();
-    let iter_i = it.iter();
+    let fnc = it.f;
+    let iter_i = it.iter;
 
     while !iter_i.is_consumed() {
-        it.curr() := iter_i.next();
+        it.curr = iter_i.next();
 
-        if fnc(*it.curr()) {
+        if fnc(fwd<'Elem>(it.curr)) {
             return;
         }
     }
     
-    it.consumed() := true;
+    it.consumed := true;
 }
 
 fn<It, Elem> iterator(it: FilterIterator<'It, 'Elem>) -> FilterIterator<'It, 'Elem> {
@@ -57,26 +63,32 @@ fn<It, Elem> iterator(it: FilterIterator<'It, 'Elem>) -> FilterIterator<'It, 'El
 }
 
 fn<It, Elem> next(it: @FilterIterator<'It, 'Elem>) -> 'Elem {    
-    let res = *it.curr();
+    let res = it.curr;
 
-    if it.iter().is_consumed() {
-        it.consumed() := true;
+    if it.iter.is_consumed() {
+        it.consumed := true;
     }
 
     it.advance_till_true();
 
-    return *res;
+    return fwd<'Elem>(res);
 }
 
 fn<It, Elem> is_consumed(it: @FilterIterator<'It, 'Elem>) -> Bool {
-    return it.iter().is_consumed() && it.consumed();
+    return it.iter.is_consumed() && it.consumed;
 }
 
+@doc(
+    "Returns an iterator that filters out the elements of `iter` using the function `f`. Only the elements for which `f` returns `true` are kept.",
+    it: "The iterator to filter.",
+    f: "The function to use in order to filter out the elements of `it`.",
+    "The filtering iterator."
+)
 fn<Cont, It, Elem> filter(it: 'Cont [Iterable<'It, 'Elem>], f: 'Elem => Bool) -> FilterIterator<'It, 'Elem> {
-    let iter_i = iterator(move(it));
+    let iter_i = iterator(*it);
     let res = FilterIterator(move(iter_i), *f, iter_i.next(), false);
 
-    if !f(*res.curr()) {
+    if !f(fwd<'Elem>(res.curr)) {
         res.advance_till_true();
     }
 
@@ -87,6 +99,11 @@ implement<It, Elem> Iterable<FilterIterator<'It, 'Elem>, 'Elem> for FilterIterat
 
 // Terminal operators
 
+@doc(
+    "Returns the sum of the elements in `it`.",
+    it: "The iterator to sum.",
+    "The result of summing the elements of `it`."
+)
 fn<It> sum(it: 'It [Iterable<'It, Int>]) -> Int {
     let res = 0;
 
@@ -97,6 +114,11 @@ fn<It> sum(it: 'It [Iterable<'It, Int>]) -> Int {
     return move(res);
 }
 
+@doc(
+    "Returns the sum of the elements in `it`.",
+    it: "The iterator to sum.",
+    "The result of summing the elements of `it`."
+)
 fn<It> sum(it: 'It [Iterable<'It, Float>]) -> Float {
     let res = 0;
 
@@ -107,6 +129,13 @@ fn<It> sum(it: 'It [Iterable<'It, Float>]) -> Float {
     return *res;
 }
 
+@doc(
+    "Returns the reduction of the elements in `it` by using the `op` function.",
+    it: "The iterator to reduce.",
+    op: "The binary function to apply.",
+    start: "The base element to use in the reduction. This would be 0 in a sum and 1 in a product, for example.",
+    "The result of reducing the elements of `it`."
+)
 fn<It, Elem> reduce(it: 'It [Iterable<'It, 'Elem>], op: ('Elem, 'Elem) => 'Elem, start: 'Elem) -> 'Elem {
     let res = move(start);
 
@@ -117,7 +146,12 @@ fn<It, Elem> reduce(it: 'It [Iterable<'It, 'Elem>], op: ('Elem, 'Elem) => 'Elem,
     return *res;
 }
 
-fn<It> count(it: 'It [Iterable<'It, Int>]) -> Int {
+@doc(
+    "Counts the number of elements in `it`.",
+    it: "The iterator to count.",
+    "The number of elements in `it`."
+)
+fn<It, Elem> count(it: 'It [Iterable<'It, 'Elem>]) -> Int {
     let res = 0;
 
     for i in move(it) {
@@ -125,4 +159,50 @@ fn<It> count(it: 'It [Iterable<'It, Int>]) -> Int {
     }
 
     return move(res);
+}
+
+/*
+    UNIT TESTS
+*/
+
+@test
+fn map_test() -> Bool {
+    let res = arr<Int>();
+
+    res.push(5);
+    res.push(8);
+    res.push(2);
+
+    let it = res.map((i: @Int) i * 2);
+    
+    return next(it) == 10 && next(it) == 16 && next(it) == 4;
+}
+
+@test
+fn filter_test() -> Bool {
+    let res = arr<Int>();
+
+    res.push(5);
+    res.push(8);
+    res.push(3);
+    res.push(6);
+
+    let even = res.filter((i: @Int) i % 2 == 0);
+    let odd = res.filter((i: @Int) i % 2 == 1);
+    
+    return next(even) == 8 && next(even) == 6 &&
+           next(odd) == 5 && next(odd) == 3;
+}
+
+@test
+fn count_test() -> Bool {
+    let res = arr<Int>();
+    let it = 0;
+
+    while it < 100 {
+        res.push(*it);
+        it.inc();
+    }
+
+    return res.filter((i: @Int) i % 2 == 0).count() == 50;
 }
