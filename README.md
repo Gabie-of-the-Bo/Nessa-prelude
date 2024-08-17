@@ -1,2 +1,2 @@
-# Nessa-prelude
-Standard libraries for the Nessa Language
+# Ryna-prelude
+Standard libraries for the Ryna Language
